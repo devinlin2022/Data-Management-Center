@@ -1,0 +1,560 @@
+<script>
+// Courses Module
+function loadCoursesModule() {
+    const content = `
+        <!-- Module Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Medical Training Courses</h2>
+                <p class="text-muted mb-0">Manage training programs and curriculum across your consultancy network</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddCourseModal()">
+                <i class="bi bi-plus-lg me-2"></i>Add New Course
+            </button>
+        </div>
+
+        <!-- Course Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Courses</h6>
+                            <h3 class="card-title text-teal mb-0">4</h3>
+                            <small class="text-primary">Available programs</small>
+                        </div>
+                        <div class="text-teal">
+                            <i class="bi bi-book fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Active Courses</h6>
+                            <h3 class="card-title text-success mb-0">2</h3>
+                            <small class="text-success">Currently running</small>
+                        </div>
+                        <div class="text-success">
+                            <i class="bi bi-clock fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Enrollments</h6>
+                            <h3 class="card-title text-info mb-0">90</h3>
+                            <small class="text-muted">Across all courses</small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Avg Rating</h6>
+                            <h3 class="card-title text-warning mb-0">4.7</h3>
+                            <small class="text-muted">Course satisfaction</small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-star fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Catalog -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Course Catalog</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="courses-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Duration</th>
+                                <th>Mode</th>
+                                <th>Enrollments</th>
+                                <th>Trainers</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-tbody">
+                            <!-- Table content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadCoursesData();
+    }
+}
+
+function loadCoursesData() {
+    const courses = [
+        {
+            id: 1,
+            title: 'Advanced Cardiology',
+            duration: '8 weeks',
+            mode: 'Hybrid',
+            totalSessions: 16,
+            traineesEnrolled: 24,
+            assignedTrainers: ['Dr. Ahmed Hassan', 'Dr. Sarah Khan'],
+            objectives: 'Master advanced cardiac diagnosis and treatment procedures',
+            curriculum: ['ECG Interpretation', 'Cardiac Catheterization', 'Heart Surgery Basics', 'Emergency Cardiology'],
+            rating: 4.8,
+            status: 'Active',
+            startDate: '2024-02-01',
+            endDate: '2024-03-29',
+            materials: 12,
+            completionRate: 85
+        },
+        {
+            id: 2,
+            title: 'Emergency Medicine',
+            duration: '6 weeks',
+            mode: 'On-site',
+            totalSessions: 18,
+            traineesEnrolled: 18,
+            assignedTrainers: ['Dr. Fatima Sheikh', 'Dr. Omar Malik'],
+            objectives: 'Develop critical emergency response and trauma care skills',
+            curriculum: ['Trauma Assessment', 'Emergency Procedures', 'Critical Care', 'Emergency Pharmacology'],
+            rating: 4.6,
+            status: 'Active',
+            startDate: '2024-02-15',
+            endDate: '2024-03-29',
+            materials: 8,
+            completionRate: 78
+        },
+        {
+            id: 3,
+            title: 'Pediatric Care',
+            duration: '10 weeks',
+            mode: 'Online',
+            totalSessions: 20,
+            traineesEnrolled: 32,
+            assignedTrainers: ['Dr. Hassan Raza', 'Dr. Aisha Malik'],
+            objectives: 'Comprehensive pediatric healthcare and development knowledge',
+            curriculum: ['Child Development', 'Pediatric Diseases', 'Vaccination Protocols', 'Family Counseling'],
+            rating: 4.9,
+            status: 'Completed',
+            startDate: '2023-12-01',
+            endDate: '2024-02-10',
+            materials: 15,
+            completionRate: 95
+        },
+        {
+            id: 4,
+            title: 'Basic Surgery',
+            duration: '12 weeks',
+            mode: 'Hybrid',
+            totalSessions: 24,
+            traineesEnrolled: 16,
+            assignedTrainers: ['Dr. Ayesha Malik'],
+            objectives: 'Foundation surgical skills and operating room procedures',
+            curriculum: ['Surgical Anatomy', 'Sterile Techniques', 'Basic Procedures', 'Post-op Care'],
+            rating: 4.4,
+            status: 'Planning',
+            startDate: '2024-04-01',
+            endDate: '2024-06-24',
+            materials: 10,
+            completionRate: 0
+        }
+    ];
+    
+    renderCoursesTable(courses);
+    window.appData.coursesData = courses;
+}
+
+function renderCoursesTable(courses) {
+    let tableHtml = '';
+    
+    courses.forEach(course => {
+        const modeBadge = getModeBadge(course.mode);
+        
+        tableHtml += `
+            <tr>
+                <td>
+                    <div>
+                        <div class="fw-medium">${course.title}</div>
+                        <small class="text-muted">${course.totalSessions} sessions</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar me-1 text-muted"></i>
+                        <span>${course.duration}</span>
+                    </div>
+                </td>
+                <td>${modeBadge}</td>
+                <td>
+                    <div class="text-center">
+                        <div class="fw-medium">${course.traineesEnrolled}</div>
+                        <small class="text-muted">enrolled</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="space-y-1">
+                        ${course.assignedTrainers.map(trainer => `<div class="fs-xs text-muted">${trainer}</div>`).join('')}
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-star-fill text-warning me-1"></i>
+                        <span>${course.rating}</span>
+                    </div>
+                </td>
+                <td>${getStatusBadge(course.status)}</td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary btn-action" onclick="viewCourseDetails(${course.id})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-action" onclick="editCourse(${course.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-warning btn-action" onclick="archiveCourse(${course.id})" title="Archive">
+                            <i class="bi bi-archive"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    // $('#courses-tbody').html(tableHtml);
+    const moduleContent = $('#courses-tbody');
+    if (moduleContent) {
+        setHTML(moduleContent, tableHtml);
+    }
+}
+
+function getModeBadge(mode) {
+    const colors = {
+        'On-site': 'bg-info text-white',
+        'Online': 'bg-success text-white',
+        'Hybrid': 'bg-primary text-white'
+    };
+    return `<span class="badge ${colors[mode] || 'bg-secondary'}">${mode}</span>`;
+}
+
+function viewCourseDetails(courseId) {
+    const course = window.appData.coursesData.find(c => c.id === courseId);
+    if (!course) return;
+    
+    Swal.fire({
+        title: `${course.title} - Course Details`,
+        html: `
+            <div class="text-start">
+                <ul class="nav nav-tabs mb-3" id="course-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                            Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="curriculum-tab" data-bs-toggle="tab" data-bs-target="#curriculum" type="button" role="tab">
+                            Curriculum
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="metrics-tab" data-bs-toggle="tab" data-bs-target="#metrics" type="button" role="tab">
+                            Metrics
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="course-tab-content">
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Duration</h6>
+                                <p class="mb-0">${course.duration}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Training Mode</h6>
+                                <div class="mt-1">${getModeBadge(course.mode)}</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Total Sessions</h6>
+                                <p class="mb-0">${course.totalSessions}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Course Rating</h6>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-star-fill text-warning me-1"></i>
+                                    <span>${course.rating}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Learning Objectives</h6>
+                            <p class="text-muted">${course.objectives}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="curriculum" role="tabpanel">
+                        <h6 class="text-muted mb-3">Curriculum Modules</h6>
+                        <div class="row">
+                            ${course.curriculum.map((module, index) => `
+                                <div class="col-md-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                                        <i class="bi bi-book text-primary me-2"></i>
+                                        <span class="fs-small">${module}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="metrics" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-primary">${course.traineesEnrolled}</h4>
+                                    <small class="text-muted">Enrolled Trainees</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-success">${course.completionRate}%</h4>
+                                    <small class="text-muted">Completion Rate</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-info">${course.materials}</h4>
+                                    <small class="text-muted">Learning Materials</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-warning">${course.assignedTrainers.length}</h4>
+                                    <small class="text-muted">Assigned Trainers</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        width: '800px',
+        showCancelButton: false,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0d9488',
+        didOpen: () => {
+            // Initialize Bootstrap tabs
+            const tabElements = document.querySelectorAll('#course-tabs button[data-bs-toggle="tab"]');
+            tabElements.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabTrigger = new bootstrap.Tab(tab);
+                    tabTrigger.show();
+                });
+            });
+        }
+    });
+}
+
+function editCourse(courseId) {
+    const course = window.appData.coursesData.find(c => c.id === courseId);
+    if (!course) return;
+    
+    Swal.fire({
+        title: 'Edit Course',
+        html: `
+            <form id="edit-course-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course Title</label>
+                        <input type="text" class="form-control" name="title" value="${course.title}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Duration</label>
+                        <input type="text" class="form-control" name="duration" value="${course.duration}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Training Mode</label>
+                        <select class="form-select" name="mode" required>
+                            <option value="On-site" ${course.mode === 'On-site' ? 'selected' : ''}>On-site</option>
+                            <option value="Online" ${course.mode === 'Online' ? 'selected' : ''}>Online</option>
+                            <option value="Hybrid" ${course.mode === 'Hybrid' ? 'selected' : ''}>Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Total Sessions</label>
+                        <input type="number" class="form-control" name="totalSessions" value="${course.totalSessions}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Course Objectives</label>
+                    <textarea class="form-control" name="objectives" rows="3" required>${course.objectives}</textarea>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update Course',
+        confirmButtonColor: '#0d9488',
+        width: '600px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('edit-course-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.title || !data.duration || !data.mode) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const courseIndex = window.appData.coursesData.findIndex(c => c.id === courseId);
+            if (courseIndex !== -1) {
+                window.appData.coursesData[courseIndex] = { 
+                    ...window.appData.coursesData[courseIndex], 
+                    ...result.value,
+                    totalSessions: parseInt(result.value.totalSessions)
+                };
+                renderCoursesTable(window.appData.coursesData);
+                showSuccessAlert('Success', 'Course updated successfully!');
+            }
+        }
+    });
+}
+
+function archiveCourse(courseId) {
+    const course = window.appData.coursesData.find(c => c.id === courseId);
+    if (!course) return;
+    
+    showConfirmDialog(
+        'Archive Course',
+        `Are you sure you want to archive "${course.title}"? This action can be reversed later.`,
+        () => {
+            const courseIndex = window.appData.coursesData.findIndex(c => c.id === courseId);
+            if (courseIndex !== -1) {
+                window.appData.coursesData[courseIndex].status = 'Archived';
+                renderCoursesTable(window.appData.coursesData);
+                showSuccessAlert('Success', 'Course archived successfully!');
+            }
+        }
+    );
+}
+
+function showAddCourseModal() {
+    const trainers = [
+        'Dr. Ahmed Hassan',
+        'Dr. Fatima Sheikh',
+        'Dr. Hassan Raza',
+        'Dr. Ayesha Malik',
+        'Dr. Sarah Khan',
+        'Dr. Omar Malik'
+    ];
+    
+    Swal.fire({
+        title: 'Create New Training Course',
+        html: `
+            <form id="add-course-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course Title *</label>
+                        <input type="text" class="form-control" name="title" placeholder="e.g., Advanced Cardiology" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Duration *</label>
+                        <input type="text" class="form-control" name="duration" placeholder="e.g., 8 weeks" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Training Mode *</label>
+                        <select class="form-select" name="mode" required>
+                            <option value="">Select mode</option>
+                            <option value="On-site">On-site</option>
+                            <option value="Online">Online</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Total Sessions</label>
+                        <input type="number" class="form-control" name="totalSessions" placeholder="Number of sessions" min="1">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Course Objectives *</label>
+                    <textarea class="form-control" name="objectives" rows="3" placeholder="Describe the main learning objectives..." required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Assign Trainer</label>
+                    <select class="form-select" name="trainer">
+                        <option value="">Select trainer (optional)</option>
+                        ${trainers.map(trainer => `<option value="${trainer}">${trainer}</option>`).join('')}
+                    </select>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Create Course',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('add-course-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.title || !data.duration || !data.mode || !data.objectives) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const newCourse = {
+                id: window.appData.coursesData.length + 1,
+                title: result.value.title,
+                duration: result.value.duration,
+                mode: result.value.mode,
+                totalSessions: parseInt(result.value.totalSessions) || 8,
+                traineesEnrolled: 0,
+                assignedTrainers: result.value.trainer ? [result.value.trainer] : [],
+                objectives: result.value.objectives,
+                curriculum: ['Module 1', 'Module 2', 'Module 3', 'Module 4'],
+                rating: 0,
+                status: 'Planning',
+                startDate: '',
+                endDate: '',
+                materials: 0,
+                completionRate: 0
+            };
+            
+            window.appData.coursesData.push(newCourse);
+            renderCoursesTable(window.appData.coursesData);
+            showSuccessAlert('Success', 'Training course created successfully!');
+        }
+    });
+}
+</script>
