@@ -1,0 +1,239 @@
+<script>
+// Dashboard Module (Vanilla JavaScript)
+function loadDashboardModule() {
+    const content = `
+        <div class="module-header">
+            <h1>Welcome back, Dr. Sarah Johnson!</h1>
+            <p>Here's a snapshot of your hospital training network.</p>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12"><h4 class="mb-3">Key Statistics</h4></div>
+            ${generateStatCards()}
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Recent Notifications</h5>
+                        <span class="badge bg-teal">5 New</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="notifications-list"></div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm">View All Notifications</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header"><h5 class="mb-0">Quick Actions</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">${generateQuickActions()}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">${generateActivityCards()}</div>`;
+    
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadNotifications();
+        loadDashboardStats();
+    }
+}
+
+async function loadDashboardStats() {
+    try {
+        const result = await apiCall('getDashboardStats');
+        if (result.success) {
+            updateStatCards(result.data);
+        }
+    } catch (error) {
+        console.warn('Failed to load dashboard stats from server, using local data');
+        // Use local data calculation
+        updateStatCardsFromLocalData();
+    }
+}
+
+function updateStatCards(stats) {
+    // Update the stat cards with real data
+    const statCards = $$('.card h3');
+    if (statCards.length >= 5) {
+        setHTML(statCards[0], stats.totalBranches || '0');
+        setHTML(statCards[1], stats.activeCourses || '0');
+        setHTML(statCards[2], stats.totalTrainees || '0');
+        setHTML(statCards[3], stats.activeTrainers || '0');
+        setHTML(statCards[4], stats.upcomingSessions || '0');
+    }
+}
+
+function updateStatCardsFromLocalData() {
+    const branches = window.appData.branchesData || [];
+    const courses = window.appData.coursesData || [];
+    const trainees = window.appData.traineesData || [];
+    const trainers = window.appData.trainersData || [];
+    const schedule = window.appData.scheduleData || [];
+    
+    const stats = {
+        totalBranches: branches.length,
+        activeCourses: courses.filter(c => c.status === 'Active').length,
+        totalTrainees: trainees.length,
+        activeTrainers: trainers.filter(t => t.status === 'Active').length,
+        upcomingSessions: schedule.filter(s => new Date(s.date) >= new Date()).length
+    };
+    
+    updateStatCards(stats);
+}
+
+function generateStatCards() {
+    const stats = [
+        { title: 'Total Branches', value: '0', icon: 'building', color: 'primary' },
+        { title: 'Active Courses', value: '0', icon: 'book', color: 'success' },
+        { title: 'Enrolled Trainees', value: '0', icon: 'mortarboard', color: 'info' },
+        { title: 'Active Trainers', value: '0', icon: 'people', color: 'teal' },
+        { title: 'Upcoming Sessions', value: '0', icon: 'calendar', color: 'warning' }
+    ];
+    
+    return stats.map(stat => `
+        <div class="col-md-6 col-lg-2 mb-3">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="card-subtitle text-muted mb-1">${stat.title}</h6>
+                        <h3 class="card-title text-${stat.color} mb-0">${stat.value}</h3>
+                    </div>
+                    <div class="text-${stat.color}">
+                        <i class="bi bi-${stat.icon} fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateQuickActions() {
+    const actions = [
+        { title: 'Add New Branch', desc: 'Register a new hospital branch', icon: 'building', action: 'add-branch' },
+        { title: 'Add New Course', desc: 'Create a training program', icon: 'book', action: 'add-course' },
+        { title: 'Schedule Training Session', desc: 'Set up a new training session', icon: 'calendar', action: 'schedule-session' }
+    ];
+    
+    return actions.map(action => `
+        <button class="btn btn-outline-primary text-start" onclick="quickAction('${action.action}')">
+            <div class="d-flex align-items-center">
+                <div class="bg-light-teal text-teal rounded p-2 me-3">
+                    <i class="bi bi-${action.icon}"></i>
+                </div>
+                <div>
+                    <div class="fw-medium">${action.title}</div>
+                    <small class="text-muted">${action.desc}</small>
+                </div>
+            </div>
+        </button>
+    `).join('');
+}
+
+function generateActivityCards() {
+    const activities = [
+        { title: 'Recent Enrollments', items: [
+            { name: 'Advanced Cardiology', value: '+5', badge: 'success' },
+            { name: 'Emergency Medicine', value: '+3', badge: 'success' },
+            { name: 'Pediatric Care', value: '+7', badge: 'success' }
+        ]},
+        { title: 'Course Completions', items: [
+            { name: 'Basic Surgery', value: '12 completed', badge: 'info' },
+            { name: 'Diagnostic Imaging', value: '8 completed', badge: 'info' },
+            { name: 'Patient Care', value: '15 completed', badge: 'info' }
+        ]},
+        { title: 'Branch Performance', items: [
+            { name: 'Lahore Branch', value: '98% completion', badge: 'teal' },
+            { name: 'Karachi Branch', value: '94% completion', badge: 'teal' },
+            { name: 'Islamabad Branch', value: '96% completion', badge: 'teal' }
+        ]}
+    ];
+    
+    return activities.map(activity => `
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">${activity.title}</h6></div>
+                <div class="card-body">
+                    ${activity.items.map(item => `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fs-small">${item.name}</span>
+                            <span class="badge badge-${item.badge}">${item.value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadNotifications() {
+    const notifications = [
+        { message: "Course 'Advanced Cardiology' starts in 2 days", icon: 'calendar', color: 'warning', time: '2 hours ago' },
+        { message: "New trainee added to 'Lahore Branch'", icon: 'person-plus', color: 'success', time: '4 hours ago' },
+        { message: "Training session 'Emergency Medicine' completed", icon: 'check-circle', color: 'primary', time: '6 hours ago' },
+        { message: "Trainer Dr. Ahmed assigned to 'Pediatric Care'", icon: 'people', color: 'info', time: '1 day ago' },
+        { message: "Branch 'Karachi Medical Center' updated capacity", icon: 'info-circle', color: 'secondary', time: '2 days ago' }
+    ];
+    
+    const notificationsHtml = notifications.map(notification => `
+        <div class="notification-item">
+            <div class="d-flex align-items-start">
+                <div class="me-3">
+                    <i class="bi bi-${notification.icon} text-${notification.color}"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <p class="mb-1 fs-small">${notification.message}</p>
+                    <small class="text-muted">${notification.time}</small>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    const notificationsList = $('#notifications-list');
+    if (notificationsList) {
+        setHTML(notificationsList, notificationsHtml);
+    }
+}
+
+function quickAction(action) {
+    const actions = {
+        'add-branch': () => {
+            loadModule('hospital-branches');
+            setTimeout(() => {
+                if (typeof showAddBranchModal === 'function') {
+                    showAddBranchModal();
+                }
+            }, 500);
+        },
+        'add-course': () => {
+            loadModule('courses');
+            setTimeout(() => {
+                if (typeof showAddCourseModal === 'function') {
+                    showAddCourseModal();
+                }
+            }, 500);
+        },
+        'schedule-session': () => {
+            loadModule('schedule');
+            setTimeout(() => {
+                if (typeof showScheduleSessionModal === 'function') {
+                    showScheduleSessionModal();
+                }
+            }, 500);
+        }
+    };
+    
+    if (actions[action]) {
+        actions[action]();
+    }
+}
+</script>
