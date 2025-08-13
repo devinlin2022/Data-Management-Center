@@ -1,0 +1,671 @@
+// Schedule Module
+<script>
+function loadScheduleModule() {
+    const content = `
+        <!-- Module Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Training Schedule</h2>
+                <p class="text-muted mb-0">Manage sessions, trainer availability, and course timelines</p>
+            </div>
+            <button class="btn btn-primary" onclick="showScheduleSessionModal()">
+                <i class="bi bi-plus-lg me-2"></i>Schedule Session
+            </button>
+        </div>
+
+        <!-- Schedule Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Today's Sessions</h6>
+                            <h3 class="card-title text-teal mb-0">4</h3>
+                            <small class="text-success">2 completed</small>
+                        </div>
+                        <div class="text-teal">
+                            <i class="bi bi-calendar fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">This Week</h6>
+                            <h3 class="card-title text-primary mb-0">18</h3>
+                            <small class="text-primary">Total sessions</small>
+                        </div>
+                        <div class="text-primary">
+                            <i class="bi bi-clock fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Active Trainers</h6>
+                            <h3 class="card-title text-info mb-0">12</h3>
+                            <small class="text-muted">Teaching today</small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Utilization</h6>
+                            <h3 class="card-title text-warning mb-0">85%</h3>
+                            <small class="text-muted">Room capacity</small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-geo-alt fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Row -->
+        <div class="row">
+            <!-- Calendar View -->
+            <div class="col-lg-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Training Calendar</h5>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-secondary btn-sm me-2">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="text-muted me-2">January 2024</span>
+                            <button class="btn btn-outline-secondary btn-sm me-3">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                            <select class="form-select form-select-sm" style="width: auto;">
+                                <option value="week">Week View</option>
+                                <option value="day">Day View</option>
+                                <option value="month">Month View</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filters -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <select class="form-select form-select-sm" id="filter-branch-schedule">
+                                    <option value="all">All Branches</option>
+                                    <option value="Downtown Medical Center">Downtown Medical Center</option>
+                                    <option value="City General Hospital">City General Hospital</option>
+                                    <option value="Capital Health Center">Capital Health Center</option>
+                                    <option value="Regional Medical Complex">Regional Medical Complex</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select form-select-sm" id="filter-trainer-schedule">
+                                    <option value="all">All Trainers</option>
+                                    <option value="Dr. Ahmed Hassan">Dr. Ahmed Hassan</option>
+                                    <option value="Dr. Fatima Sheikh">Dr. Fatima Sheikh</option>
+                                    <option value="Dr. Hassan Raza">Dr. Hassan Raza</option>
+                                    <option value="Dr. Ayesha Malik">Dr. Ayesha Malik</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-primary btn-sm" onclick="applyScheduleFilters()">
+                                    <i class="bi bi-funnel me-1"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sessions List -->
+                        <div id="schedule-sessions">
+                            <!-- Sessions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Sessions -->
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Upcoming Sessions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="upcoming-sessions">
+                            <!-- Upcoming sessions will be loaded here -->
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-3">View All Sessions</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Overview -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Weekly Schedule Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Mon</div>
+                        <div class="badge bg-teal text-white mb-1">3 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Tue</div>
+                        <div class="badge bg-teal text-white mb-1">3 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Wed</div>
+                        <div class="badge bg-teal text-white mb-1">3 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Thu</div>
+                        <div class="badge bg-teal text-white mb-1">3 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Fri</div>
+                        <div class="badge bg-teal text-white mb-1">3 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Sat</div>
+                        <div class="badge bg-primary text-white mb-1">2 sessions</div>
+                    </div>
+                    <div class="col text-center">
+                        <div class="fw-medium text-muted mb-2">Sun</div>
+                        <div class="badge bg-secondary text-white mb-1">No sessions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // $('#module-content').html(content);
+    // loadScheduleData();
+    // setupScheduleFilters();
+
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadScheduleData();
+        setupScheduleFilters();
+    }
+}
+
+function loadScheduleData() {
+    const sessions = [
+        {
+            id: 1,
+            title: 'Advanced Cardiology - Module 3',
+            course: 'Advanced Cardiology',
+            trainer: 'Dr. Ahmed Hassan',
+            branch: 'Downtown Medical Center',
+            date: '2024-01-28',
+            time: '09:00 - 11:00',
+            attendees: 24,
+            type: 'Lecture',
+            status: 'Scheduled'
+        },
+        {
+            id: 2,
+            title: 'Emergency Medicine - Practical',
+            course: 'Emergency Medicine',
+            trainer: 'Dr. Fatima Sheikh',
+            branch: 'City General Hospital',
+            date: '2024-01-28',
+            time: '14:00 - 16:00',
+            attendees: 18,
+            type: 'Practical',
+            status: 'Scheduled'
+        },
+        {
+            id: 3,
+            title: 'Pediatric Care - Assessment',
+            course: 'Pediatric Care',
+            trainer: 'Dr. Hassan Raza',
+            branch: 'Capital Health Center',
+            date: '2024-01-29',
+            time: '10:00 - 12:00',
+            attendees: 32,
+            type: 'Assessment',
+            status: 'Completed'
+        },
+        {
+            id: 4,
+            title: 'Basic Surgery - OR Training',
+            course: 'Basic Surgery',
+            trainer: 'Dr. Ayesha Malik',
+            branch: 'Regional Medical Complex',
+            date: '2024-01-29',
+            time: '13:00 - 17:00',
+            attendees: 16,
+            type: 'Practical',
+            status: 'Cancelled'
+        },
+        {
+            id: 5,
+            title: 'Advanced Cardiology - Case Studies',
+            course: 'Advanced Cardiology',
+            trainer: 'Dr. Ahmed Hassan',
+            branch: 'Downtown Medical Center',
+            date: '2024-01-30',
+            time: '11:00 - 13:00',
+            attendees: 24,
+            type: 'Workshop',
+            status: 'Scheduled'
+        }
+    ];
+    
+    const upcomingSessions = [
+        {
+            id: 1,
+            title: 'Emergency Medicine Simulation',
+            date: 'Today',
+            time: '09:00 AM',
+            trainer: 'Dr. Fatima Sheikh',
+            trainees: 18,
+            location: 'City General Hospital - Room 203'
+        },
+        {
+            id: 2,
+            title: 'Cardiology Case Review',
+            date: 'Tomorrow',
+            time: '02:00 PM',
+            trainer: 'Dr. Ahmed Hassan',
+            trainees: 24,
+            location: 'Downtown Medical Center - Conference Hall'
+        },
+        {
+            id: 3,
+            title: 'Pediatric Assessment',
+            date: 'Jan 30',
+            time: '10:00 AM',
+            trainer: 'Dr. Hassan Raza',
+            trainees: 32,
+            location: 'Capital Health Center - Training Room A'
+        },
+        {
+            id: 4,
+            title: 'Surgery Practical Session',
+            date: 'Jan 31',
+            time: '01:00 PM',
+            trainer: 'Dr. Ayesha Malik',
+            trainees: 16,
+            location: 'Regional Medical Complex - OR Simulation'
+        }
+    ];
+    
+    renderScheduleSessions(sessions);
+    renderUpcomingSessions(upcomingSessions);
+    
+    window.appData.scheduleData = sessions;
+    window.appData.upcomingSessions = upcomingSessions;
+}
+
+function renderScheduleSessions(sessions) {
+    let sessionsHtml = '';
+    
+    sessions.forEach(session => {
+        const statusBadge = getStatusBadge(session.status);
+        const typeBadge = getTypeBadge(session.type);
+        
+        sessionsHtml += `
+            <div class="schedule-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-2">
+                            <h6 class="mb-0 me-2">${session.title}</h6>
+                            ${typeBadge}
+                            ${statusBadge}
+                        </div>
+                        <div class="row text-muted fs-small">
+                            <div class="col-md-3">
+                                <i class="bi bi-calendar me-1"></i>
+                                ${formatDate(session.date)}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="bi bi-clock me-1"></i>
+                                ${session.time}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="bi bi-person me-1"></i>
+                                ${session.trainer}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="bi bi-people me-1"></i>
+                                ${session.attendees} attendees
+                            </div>
+                        </div>
+                        <div class="mt-1 fs-small text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            ${session.branch}
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary btn-action" onclick="editSession(${session.id})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-action" onclick="deleteSession(${session.id})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    // $('#schedule-sessions').html(sessionsHtml);
+    const moduleContent = $('#schedule-sessions');
+    if (moduleContent) {
+        setHTML(moduleContent, sessionsHtml);
+    }
+}
+
+function renderUpcomingSessions(sessions) {
+    let sessionsHtml = '';
+    
+    sessions.forEach(session => {
+        sessionsHtml += `
+            <div class="bg-light rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">${session.title}</h6>
+                    <span class="badge bg-outline-primary">${session.date}</span>
+                </div>
+                <div class="fs-xs text-muted">
+                    <div class="mb-1">
+                        <i class="bi bi-clock me-1"></i>
+                        ${session.time}
+                    </div>
+                    <div class="mb-1">
+                        <i class="bi bi-person me-1"></i>
+                        ${session.trainer}
+                    </div>
+                    <div class="mb-1">
+                        <i class="bi bi-people me-1"></i>
+                        ${session.trainees} trainees
+                    </div>
+                    <div>
+                        <i class="bi bi-geo-alt me-1"></i>
+                        <span class="fs-xs">${session.location}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    // $('#upcoming-sessions').html(sessionsHtml);
+    const moduleContent = $('#upcoming-sessions');
+    if (moduleContent) {
+        setHTML(moduleContent, sessionsHtml);
+    }
+}
+
+function getTypeBadge(type) {
+    const colors = {
+        'Lecture': 'bg-primary text-white',
+        'Practical': 'bg-success text-white',
+        'Assessment': 'bg-warning text-white',
+        'Workshop': 'bg-info text-white'
+    };
+    return `<span class="badge ${colors[type] || 'bg-secondary'}">${type}</span>`;
+}
+
+function setupScheduleFilters() {
+    // 将需要监听的元素 ID 放入数组
+    const filterIds = ['filter-branch-schedule', 'filter-trainer-schedule'];
+
+    // 循环为每个元素添加事件监听
+    filterIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', applyScheduleFilters);
+        }
+    });
+}
+
+function applyScheduleFilters() {
+    // 使用 .value 属性获取下拉菜单的当前值
+    const branchFilter = document.getElementById('filter-branch-schedule').value;
+    const trainerFilter = document.getElementById('filter-trainer-schedule').value;
+    
+    // 下面的过滤逻辑已经是原生 JavaScript，无需改动
+    let filteredSessions = window.appData.scheduleData;
+    
+    if (branchFilter !== 'all') {
+        filteredSessions = filteredSessions.filter(s => s.branch === branchFilter);
+    }
+    
+    if (trainerFilter !== 'all') {
+        filteredSessions = filteredSessions.filter(s => s.trainer === trainerFilter);
+    }
+    
+    renderScheduleSessions(filteredSessions);
+}
+
+function editSession(sessionId) {
+    const session = window.appData.scheduleData.find(s => s.id === sessionId);
+    if (!session) return;
+    
+    const courses = ['Advanced Cardiology', 'Emergency Medicine', 'Pediatric Care', 'Basic Surgery'];
+    const trainers = ['Dr. Ahmed Hassan', 'Dr. Fatima Sheikh', 'Dr. Hassan Raza', 'Dr. Ayesha Malik'];
+    const branches = ['Downtown Medical Center', 'City General Hospital', 'Capital Health Center', 'Regional Medical Complex'];
+    
+    Swal.fire({
+        title: 'Edit Training Session',
+        html: `
+            <form id="edit-session-form">
+                <div class="mb-3">
+                    <label class="form-label">Session Title</label>
+                    <input type="text" class="form-control" name="title" value="${session.title}" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course</label>
+                        <select class="form-select" name="course" required>
+                            ${courses.map(course => `
+                                <option value="${course}" ${session.course === course ? 'selected' : ''}>${course}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Trainer</label>
+                        <select class="form-select" name="trainer" required>
+                            ${trainers.map(trainer => `
+                                <option value="${trainer}" ${session.trainer === trainer ? 'selected' : ''}>${trainer}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch</label>
+                        <select class="form-select" name="branch" required>
+                            ${branches.map(branch => `
+                                <option value="${branch}" ${session.branch === branch ? 'selected' : ''}>${branch}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" value="${session.date}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Time</label>
+                        <input type="text" class="form-control" name="time" value="${session.time}" placeholder="09:00 - 11:00">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Session Type</label>
+                        <select class="form-select" name="type">
+                            <option value="Lecture" ${session.type === 'Lecture' ? 'selected' : ''}>Lecture</option>
+                            <option value="Practical" ${session.type === 'Practical' ? 'selected' : ''}>Practical</option>
+                            <option value="Assessment" ${session.type === 'Assessment' ? 'selected' : ''}>Assessment</option>
+                            <option value="Workshop" ${session.type === 'Workshop' ? 'selected' : ''}>Workshop</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update Session',
+        confirmButtonColor: '#0d9488',
+        width: '600px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('edit-session-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.title || !data.course || !data.trainer || !data.date) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const sessionIndex = window.appData.scheduleData.findIndex(s => s.id === sessionId);
+            if (sessionIndex !== -1) {
+                window.appData.scheduleData[sessionIndex] = { 
+                    ...window.appData.scheduleData[sessionIndex], 
+                    ...result.value 
+                };
+                applyScheduleFilters(); // Refresh with current filters
+                showSuccessAlert('Success', 'Training session updated successfully!');
+            }
+        }
+    });
+}
+
+function deleteSession(sessionId) {
+    const session = window.appData.scheduleData.find(s => s.id === sessionId);
+    if (!session) return;
+    
+    showConfirmDialog(
+        'Delete Session',
+        `Are you sure you want to delete "${session.title}"? This action cannot be undone.`,
+        () => {
+            window.appData.scheduleData = window.appData.scheduleData.filter(s => s.id !== sessionId);
+            applyScheduleFilters(); // Refresh with current filters
+            showSuccessAlert('Success', 'Training session deleted successfully!');
+        }
+    );
+}
+
+function showScheduleSessionModal() {
+    const courses = ['Advanced Cardiology', 'Emergency Medicine', 'Pediatric Care', 'Basic Surgery'];
+    const trainers = ['Dr. Ahmed Hassan', 'Dr. Fatima Sheikh', 'Dr. Hassan Raza', 'Dr. Ayesha Malik'];
+    const branches = ['Downtown Medical Center', 'City General Hospital', 'Capital Health Center', 'Regional Medical Complex'];
+    
+    Swal.fire({
+        title: 'Schedule New Training Session',
+        html: `
+            <form id="schedule-session-form">
+                <div class="mb-3">
+                    <label class="form-label">Session Title *</label>
+                    <input type="text" class="form-control" name="title" placeholder="e.g., Cardiology Module 1" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course *</label>
+                        <select class="form-select" name="course" required>
+                            <option value="">Select course</option>
+                            ${courses.map(course => `<option value="${course}">${course}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Trainer *</label>
+                        <select class="form-select" name="trainer" required>
+                            <option value="">Select trainer</option>
+                            ${trainers.map(trainer => `<option value="${trainer}">${trainer}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch *</label>
+                        <select class="form-select" name="branch" required>
+                            <option value="">Select branch</option>
+                            ${branches.map(branch => `<option value="${branch}">${branch}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-control" name="startTime">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-control" name="endTime">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Session Type</label>
+                        <select class="form-select" name="type">
+                            <option value="Lecture">Lecture</option>
+                            <option value="Practical">Practical</option>
+                            <option value="Assessment">Assessment</option>
+                            <option value="Workshop">Workshop</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Max Attendees</label>
+                    <input type="number" class="form-control" name="maxAttendees" placeholder="30" min="1">
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Schedule Session',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('schedule-session-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.title || !data.course || !data.trainer || !data.branch || !data.date) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const timeString = result.value.startTime && result.value.endTime 
+                ? `${formatTime(result.value.startTime)} - ${formatTime(result.value.endTime)}`
+                : 'TBD';
+            
+            const newSession = {
+                id: window.appData.scheduleData.length + 1,
+                title: result.value.title,
+                course: result.value.course,
+                trainer: result.value.trainer,
+                branch: result.value.branch,
+                date: result.value.date,
+                time: timeString,
+                attendees: parseInt(result.value.maxAttendees) || 0,
+                type: result.value.type || 'Lecture',
+                status: 'Scheduled'
+            };
+            
+            window.appData.scheduleData.push(newSession);
+            applyScheduleFilters(); // Refresh with current filters
+            showSuccessAlert('Success', 'Training session scheduled successfully!');
+        }
+    });
+}
+</script>
