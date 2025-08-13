@@ -1,0 +1,653 @@
+<script>
+// Trainers Module
+function loadTrainersModule() {
+    const content = `
+        <!-- Module Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Medical Trainers</h2>
+                <p class="text-muted mb-0">Manage professionals delivering medical training across your network</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddTrainerModal()">
+                <i class="bi bi-plus-lg me-2"></i>Add Trainer
+            </button>
+        </div>
+
+        <!-- Trainer Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Trainers</h6>
+                            <h3 class="card-title text-teal mb-0">4</h3>
+                            <small class="text-primary">Professional staff</small>
+                        </div>
+                        <div class="text-teal">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Active Trainers</h6>
+                            <h3 class="card-title text-success mb-0">3</h3>
+                            <small class="text-success">Currently teaching</small>
+                        </div>
+                        <div class="text-success">
+                            <i class="bi bi-person-check fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Avg Rating</h6>
+                            <h3 class="card-title text-warning mb-0">4.7</h3>
+                            <small class="text-muted">Trainer performance</small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-star fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Trainees</h6>
+                            <h3 class="card-title text-info mb-0">143</h3>
+                            <small class="text-muted">Under guidance</small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-mortarboard fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trainers Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Training Faculty</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="trainers-table">
+                        <thead>
+                            <tr>
+                                <th>Trainer</th>
+                                <th>Specialty</th>
+                                <th>Branch</th>
+                                <th>Courses</th>
+                                <th>Trainees</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trainers-tbody">
+                            <!-- Table content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // $('#module-content').html(content);
+    // loadTrainersData();
+
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadTrainersData();
+    }
+}
+
+function loadTrainersData() {
+    const trainers = [
+        {
+            id: 1,
+            name: 'Dr. Ahmed Hassan',
+            specialty: 'Cardiology',
+            coursesHandled: ['Advanced Cardiology', 'Basic ECG Reading'],
+            branchAssigned: 'Downtown Medical Center',
+            rating: 4.8,
+            phone: '+92-300-1111111',
+            email: 'ahmed.hassan@hospital.com',
+            qualifications: 'MBBS, MD Cardiology, FCPS',
+            experience: '12 years',
+            status: 'Active',
+            totalTrainees: 45,
+            completedCourses: 8,
+            availability: 'Full-time'
+        },
+        {
+            id: 2,
+            name: 'Dr. Fatima Sheikh',
+            specialty: 'Emergency Medicine',
+            coursesHandled: ['Emergency Medicine', 'Trauma Care'],
+            branchAssigned: 'City General Hospital',
+            rating: 4.6,
+            phone: '+92-301-2222222',
+            email: 'fatima.sheikh@hospital.com',
+            qualifications: 'MBBS, FCPS Emergency Medicine',
+            experience: '8 years',
+            status: 'Active',
+            totalTrainees: 32,
+            completedCourses: 6,
+            availability: 'Part-time'
+        },
+        {
+            id: 3,
+            name: 'Dr. Hassan Raza',
+            specialty: 'Pediatrics',
+            coursesHandled: ['Pediatric Care', 'Child Development'],
+            branchAssigned: 'Capital Health Center',
+            rating: 4.9,
+            phone: '+92-302-3333333',
+            email: 'hassan.raza@hospital.com',
+            qualifications: 'MBBS, FCPS Pediatrics, Diploma Child Health',
+            experience: '15 years',
+            status: 'Active',
+            totalTrainees: 38,
+            completedCourses: 12,
+            availability: 'Full-time'
+        },
+        {
+            id: 4,
+            name: 'Dr. Ayesha Malik',
+            specialty: 'Surgery',
+            coursesHandled: ['Basic Surgery', 'Surgical Techniques'],
+            branchAssigned: 'Regional Medical Complex',
+            rating: 4.4,
+            phone: '+92-303-4444444',
+            email: 'ayesha.malik@hospital.com',
+            qualifications: 'MBBS, MS Surgery, FCPS',
+            experience: '10 years',
+            status: 'On Leave',
+            totalTrainees: 28,
+            completedCourses: 5,
+            availability: 'Unavailable'
+        }
+    ];
+    
+    renderTrainersTable(trainers);
+    window.appData.trainersData = trainers;
+}
+
+function renderTrainersTable(trainers) {
+    let tableHtml = '';
+    
+    trainers.forEach(trainer => {
+        const statusBadge = getStatusBadge(trainer.status);
+        const availabilityBadge = getAvailabilityBadge(trainer.availability);
+        
+        tableHtml += `
+            <tr>
+                <td>
+                    <div>
+                        <div class="fw-medium">${trainer.name}</div>
+                        <small class="text-muted">${trainer.experience} experience</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-primary text-white">${trainer.specialty}</span>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-1 text-muted"></i>
+                        <span class="fs-small">${trainer.branchAssigned}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        ${trainer.coursesHandled.map(course => `<div class="fs-xs text-muted">${course}</div>`).join('')}
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="fw-medium">${trainer.totalTrainees}</div>
+                    <small class="text-muted">active</small>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-star-fill text-warning me-1"></i>
+                        <span>${trainer.rating}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        ${statusBadge}
+                        <div class="mt-1">${availabilityBadge}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary btn-action" onclick="viewTrainerProfile(${trainer.id})" title="View Profile">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-action" onclick="assignCourseToTrainer(${trainer.id})" title="Assign Course">
+                            <i class="bi bi-book"></i>
+                        </button>
+                        <button class="btn btn-outline-info btn-action" onclick="editTrainer(${trainer.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    const moduleContent = $('#trainees-tbody');
+    if (moduleContent) {
+        setHTML(moduleContent, tableHtml);
+    }
+}
+
+function getAvailabilityBadge(availability) {
+    const colors = {
+        'Full-time': 'bg-success text-white',
+        'Part-time': 'bg-info text-white',
+        'Unavailable': 'bg-danger text-white'
+    };
+    return `<span class="badge ${colors[availability] || 'bg-secondary'}">${availability}</span>`;
+}
+
+function viewTrainerProfile(trainerId) {
+    const trainer = window.appData.trainersData.find(t => t.id === trainerId);
+    if (!trainer) return;
+    
+    Swal.fire({
+        title: `${trainer.name} - Profile`,
+        html: `
+            <div class="text-start">
+                <ul class="nav nav-tabs mb-3" id="trainer-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="professional-tab" data-bs-toggle="tab" data-bs-target="#professional" type="button" role="tab">
+                            Professional Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments" type="button" role="tab">
+                            Assignments
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">
+                            Performance
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="trainer-tab-content">
+                    <div class="tab-pane fade show active" id="professional" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Name</h6>
+                                <p class="mb-0">${trainer.name}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Specialty</h6>
+                                <p class="mb-0">${trainer.specialty}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Qualifications</h6>
+                                <p class="mb-0">${trainer.qualifications}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Experience</h6>
+                                <p class="mb-0">${trainer.experience}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Phone</h6>
+                                <p class="mb-0">${trainer.phone}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Email</h6>
+                                <p class="mb-0">${trainer.email}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="assignments" role="tabpanel">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Branch Assigned</h6>
+                                <p class="mb-0">${trainer.branchAssigned}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-1">Availability</h6>
+                                <div class="mt-1">${getAvailabilityBadge(trainer.availability)}</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Courses Handled</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                ${trainer.coursesHandled.map(course => `
+                                    <span class="badge bg-light text-dark border">${course}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="performance" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-primary">${trainer.totalTrainees}</h4>
+                                    <small class="text-muted">Active Trainees</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-success">${trainer.completedCourses}</h4>
+                                    <small class="text-muted">Completed Courses</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-warning">${trainer.rating}</h4>
+                                    <small class="text-muted">Average Rating</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-info">${trainer.coursesHandled.length}</h4>
+                                    <small class="text-muted">Active Courses</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        width: '800px',
+        showCancelButton: false,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0d9488',
+        didOpen: () => {
+            // Initialize Bootstrap tabs
+            const tabElements = document.querySelectorAll('#trainer-tabs button[data-bs-toggle="tab"]');
+            tabElements.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabTrigger = new bootstrap.Tab(tab);
+                    tabTrigger.show();
+                });
+            });
+        }
+    });
+}
+
+function assignCourseToTrainer(trainerId) {
+    const trainer = window.appData.trainersData.find(t => t.id === trainerId);
+    if (!trainer) return;
+    
+    const courses = [
+        'Advanced Cardiology',
+        'Emergency Medicine',
+        'Pediatric Care',
+        'Basic Surgery',
+        'Internal Medicine',
+        'Diagnostic Imaging',
+        'Neurology Basics',
+        'Orthopedic Care'
+    ];
+    
+    Swal.fire({
+        title: `Assign Course to ${trainer.name}`,
+        html: `
+            <form id="assign-course-trainer-form">
+                <div class="mb-3">
+                    <label class="form-label">Select Course</label>
+                    <select class="form-select" name="course" required>
+                        <option value="">Choose course</option>
+                        ${courses.map(course => `<option value="${course}">${course}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="startDate">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Additional Notes</label>
+                    <textarea class="form-control" name="notes" rows="2" placeholder="Any additional instructions or notes..."></textarea>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Assign Course',
+        confirmButtonColor: '#0d9488',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('assign-course-trainer-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.course) {
+                Swal.showValidationMessage('Please select a course');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const trainerIndex = window.appData.trainersData.findIndex(t => t.id === trainerId);
+            if (trainerIndex !== -1 && !trainer.coursesHandled.includes(result.value.course)) {
+                window.appData.trainersData[trainerIndex].coursesHandled.push(result.value.course);
+                renderTrainersTable(window.appData.trainersData);
+                showSuccessAlert('Success', 'Course assigned successfully!');
+            }
+        }
+    });
+}
+
+function editTrainer(trainerId) {
+    const trainer = window.appData.trainersData.find(t => t.id === trainerId);
+    if (!trainer) return;
+    
+    const specialties = [
+        'Cardiology', 'Emergency Medicine', 'Pediatrics', 'Surgery',
+        'Internal Medicine', 'Neurology', 'Orthopedics', 'Radiology',
+        'Psychiatry', 'Dermatology'
+    ];
+    
+    const branches = [
+        'Downtown Medical Center', 'City General Hospital', 
+        'Capital Health Center', 'Regional Medical Complex'
+    ];
+    
+    Swal.fire({
+        title: 'Edit Trainer Information',
+        html: `
+            <form id="edit-trainer-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="name" value="${trainer.name}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Specialty</label>
+                        <select class="form-select" name="specialty" required>
+                            ${specialties.map(specialty => `
+                                <option value="${specialty}" ${trainer.specialty === specialty ? 'selected' : ''}>${specialty}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="${trainer.phone}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="${trainer.email}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Qualifications</label>
+                        <input type="text" class="form-control" name="qualifications" value="${trainer.qualifications}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Experience</label>
+                        <input type="text" class="form-control" name="experience" value="${trainer.experience}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch Assigned</label>
+                        <select class="form-select" name="branchAssigned">
+                            ${branches.map(branch => `
+                                <option value="${branch}" ${trainer.branchAssigned === branch ? 'selected' : ''}>${branch}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="Active" ${trainer.status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="On Leave" ${trainer.status === 'On Leave' ? 'selected' : ''}>On Leave</option>
+                            <option value="Inactive" ${trainer.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update Trainer',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('edit-trainer-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.specialty) {
+                Swal.showValidationMessage('Please fill in required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const trainerIndex = window.appData.trainersData.findIndex(t => t.id === trainerId);
+            if (trainerIndex !== -1) {
+                window.appData.trainersData[trainerIndex] = { 
+                    ...window.appData.trainersData[trainerIndex], 
+                    ...result.value 
+                };
+                renderTrainersTable(window.appData.trainersData);
+                showSuccessAlert('Success', 'Trainer information updated successfully!');
+            }
+        }
+    });
+}
+
+function showAddTrainerModal() {
+    const specialties = [
+        'Cardiology', 'Emergency Medicine', 'Pediatrics', 'Surgery',
+        'Internal Medicine', 'Neurology', 'Orthopedics', 'Radiology',
+        'Psychiatry', 'Dermatology'
+    ];
+    
+    const branches = [
+        'Downtown Medical Center', 'City General Hospital', 
+        'Capital Health Center', 'Regional Medical Complex'
+    ];
+    
+    Swal.fire({
+        title: 'Add New Medical Trainer',
+        html: `
+            <form id="add-trainer-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" name="name" placeholder="Dr. John Smith" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Specialty *</label>
+                        <select class="form-select" name="specialty" required>
+                            <option value="">Select specialty</option>
+                            ${specialties.map(specialty => `<option value="${specialty}">${specialty}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="+92-XXX-XXXXXXX">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" placeholder="trainer@hospital.com">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Qualifications</label>
+                        <input type="text" class="form-control" name="qualifications" placeholder="MBBS, FCPS, etc.">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Experience</label>
+                        <input type="text" class="form-control" name="experience" placeholder="e.g., 10 years">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Assign Branch</label>
+                    <select class="form-select" name="branchAssigned">
+                        <option value="">Select branch (optional)</option>
+                        ${branches.map(branch => `<option value="${branch}">${branch}</option>`).join('')}
+                    </select>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add Trainer',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('add-trainer-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.specialty) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const newTrainer = {
+                id: window.appData.trainersData.length + 1,
+                name: result.value.name,
+                specialty: result.value.specialty,
+                coursesHandled: [],
+                branchAssigned: result.value.branchAssigned || 'Not assigned',
+                rating: 0,
+                phone: result.value.phone || 'Not provided',
+                email: result.value.email || 'Not provided',
+                qualifications: result.value.qualifications || 'Not provided',
+                experience: result.value.experience || 'Not specified',
+                status: 'Active',
+                totalTrainees: 0,
+                completedCourses: 0,
+                availability: 'Full-time'
+            };
+            
+            window.appData.trainersData.push(newTrainer);
+            renderTrainersTable(window.appData.trainersData);
+            showSuccessAlert('Success', 'Medical trainer added successfully!');
+        }
+    });
+}
+</script>
