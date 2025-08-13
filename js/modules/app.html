@@ -1,0 +1,405 @@
+<script>
+// Main Application Controller (Vanilla JavaScript)
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    loadModule('dashboard');
+});
+
+function initializeApp() {
+    // Load data from server or localStorage
+    loadApplicationData();
+    
+    // Setup navigation
+    setupNavigation();
+    
+    // Setup mobile sidebar if needed
+    if (window.innerWidth <= 768) {
+        setupMobileSidebar();
+    }
+    
+    // Initialize tooltips
+    initializeTooltips();
+}
+
+async function loadApplicationData() {
+    try {
+        // Try to load from server first, fallback to localStorage
+        const serverData = await loadServerData();
+        if (serverData) {
+            window.appData = { ...window.appData, ...serverData };
+        } else {
+            // Fallback to localStorage
+            window.appData.branchesData = loadFromStorage('branchesData', getDefaultBranchesData());
+            window.appData.traineesData = loadFromStorage('traineesData', getDefaultTraineesData());
+            window.appData.coursesData = loadFromStorage('coursesData', getDefaultCoursesData());
+            window.appData.trainersData = loadFromStorage('trainersData', getDefaultTrainersData());
+            window.appData.scheduleData = loadFromStorage('scheduleData', getDefaultScheduleData());
+        }
+    } catch (error) {
+        console.warn('Failed to load from server, using local data:', error);
+        // Use default data
+        window.appData.branchesData = getDefaultBranchesData();
+        window.appData.traineesData = getDefaultTraineesData();
+        window.appData.coursesData = getDefaultCoursesData();
+        window.appData.trainersData = getDefaultTrainersData();
+        window.appData.scheduleData = getDefaultScheduleData();
+    }
+}
+
+async function loadServerData() {
+    try {
+        const [branches, trainees, courses, trainers, schedule] = await Promise.all([
+            apiCall('getBranches'),
+            apiCall('getTrainees'),
+            apiCall('getCourses'),
+            apiCall('getTrainers'),
+            apiCall('getSchedule')
+        ]);
+        
+        return {
+            branchesData: branches.success ? branches.data : [],
+            traineesData: trainees.success ? trainees.data : [],
+            coursesData: courses.success ? courses.data : [],
+            trainersData: trainers.success ? trainers.data : [],
+            scheduleData: schedule.success ? schedule.data : []
+        };
+    } catch (error) {
+        console.error('Failed to load server data:', error);
+        return null;
+    }
+}
+
+function setupNavigation() {
+    const navLinks = $$('.sidebar .nav-link');
+    navLinks.forEach(link => {
+        on(link, 'click', function(e) {
+            e.preventDefault();
+            
+            const module = this.getAttribute('data-module');
+            
+            // Update active state
+            navLinks.forEach(l => removeClass(l, 'active'));
+            addClass(this, 'active');
+            
+            // Load the module
+            loadModule(module);
+        });
+    });
+}
+
+function setupMobileSidebar() {
+    const sidebarToggle = $('#sidebar-toggle');
+    if (sidebarToggle) {
+        show(sidebarToggle);
+        
+        on(sidebarToggle, 'click', function() {
+            const sidebar = $('#sidebar');
+            const body = document.body;
+            
+            toggleClass(sidebar, 'show');
+            toggleClass(body, 'sidebar-open');
+        });
+        
+        // Close sidebar when clicking outside
+        on(document, 'click', function(e) {
+            const sidebar = $('#sidebar');
+            const sidebarToggle = $('#sidebar-toggle');
+            
+            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                removeClass(sidebar, 'show');
+                removeClass(document.body, 'sidebar-open');
+            }
+        });
+    }
+}
+
+function initializeTooltips() {
+    const tooltipTriggerList = $$('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+
+function loadModule(moduleName) {
+    showLoading();
+    
+    // Clear current content
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, '');
+    }
+    
+    // Load module content based on moduleName
+    switch(moduleName) {
+        case 'dashboard':
+            loadDashboardModule();
+            break;
+        case 'hospital-branches':
+            loadHospitalBranchesModule();
+            break;
+        case 'trainees':
+            loadTraineesModule();
+            break;
+        case 'courses':
+            loadCoursesModule();
+            break;
+        case 'trainers':
+            loadTrainersModule();
+            break;
+        case 'schedule':
+            loadScheduleModule();
+            break;
+        default:
+            loadDashboardModule();
+    }
+    
+    hideLoading();
+}
+
+function showLoading() {
+    const loading = $('#loading');
+    if (loading) {
+        removeClass(loading, 'd-none');
+    }
+}
+
+function hideLoading() {
+    const loading = $('#loading');
+    if (loading) {
+        addClass(loading, 'd-none');
+    }
+}
+
+// Default data functions (fallback data)
+function getDefaultBranchesData() {
+    return [
+        {
+            id: 1,
+            name: 'Downtown Medical Center',
+            location: 'Lahore, Punjab',
+            phone: '+92-42-111-2233',
+            email: 'downtown@hospital.com',
+            activeTrainees: 45,
+            coursesOffered: 8,
+            trainersAssigned: 12,
+            adminAssigned: 'Dr. Ahmed Khan',
+            capacity: 50,
+            status: 'Active'
+        },
+        {
+            id: 2,
+            name: 'City General Hospital',
+            location: 'Karachi, Sindh',
+            phone: '+92-21-111-4455',
+            email: 'citygeneral@hospital.com',
+            activeTrainees: 38,
+            coursesOffered: 6,
+            trainersAssigned: 9,
+            adminAssigned: 'Dr. Fatima Ali',
+            capacity: 40,
+            status: 'Active'
+        },
+        {
+            id: 3,
+            name: 'Capital Health Center',
+            location: 'Islamabad, ICT',
+            phone: '+92-51-111-6677',
+            email: 'capital@hospital.com',
+            activeTrainees: 32,
+            coursesOffered: 7,
+            trainersAssigned: 8,
+            adminAssigned: 'Dr. Hassan Raza',
+            capacity: 35,
+            status: 'Active'
+        },
+        {
+            id: 4,
+            name: 'Regional Medical Complex',
+            location: 'Faisalabad, Punjab',
+            phone: '+92-41-111-8899',
+            email: 'regional@hospital.com',
+            activeTrainees: 28,
+            coursesOffered: 5,
+            trainersAssigned: 7,
+            adminAssigned: 'Dr. Ayesha Malik',
+            capacity: 30,
+            status: 'Pending Setup'
+        }
+    ];
+}
+
+function getDefaultTraineesData() {
+    return [
+        {
+            id: 1,
+            name: 'Dr. Aisha Khan',
+            cnic: '12345-6789012-3',
+            phone: '+92-300-1234567',
+            email: 'aisha.khan@email.com',
+            hospitalBranch: 'Downtown Medical Center',
+            courseEnrolled: 'Advanced Cardiology',
+            trainer: 'Dr. Ahmed Hassan',
+            enrollmentDate: '2024-01-15',
+            status: 'Active',
+            progress: 75,
+            completedModules: 6,
+            totalModules: 8,
+            certificatesEarned: 2
+        },
+        {
+            id: 2,
+            name: 'Dr. Muhammad Ali',
+            cnic: '12345-6789012-4',
+            phone: '+92-301-2345678',
+            email: 'muhammad.ali@email.com',
+            hospitalBranch: 'City General Hospital',
+            courseEnrolled: 'Emergency Medicine',
+            trainer: 'Dr. Fatima Sheikh',
+            enrollmentDate: '2024-02-01',
+            status: 'Active',
+            progress: 60,
+            completedModules: 4,
+            totalModules: 8,
+            certificatesEarned: 1
+        },
+        {
+            id: 3,
+            name: 'Dr. Fatima Malik',
+            cnic: '12345-6789012-5',
+            phone: '+92-302-3456789',
+            email: 'fatima.malik@email.com',
+            hospitalBranch: 'Capital Health Center',
+            courseEnrolled: 'Pediatric Care',
+            trainer: 'Dr. Hassan Raza',
+            enrollmentDate: '2023-11-20',
+            status: 'Completed',
+            progress: 100,
+            completedModules: 10,
+            totalModules: 10,
+            certificatesEarned: 3
+        }
+    ];
+}
+
+function getDefaultCoursesData() {
+    return [
+        {
+            id: 1,
+            title: 'Advanced Cardiology',
+            duration: '8 weeks',
+            mode: 'Hybrid',
+            totalSessions: 16,
+            traineesEnrolled: 24,
+            assignedTrainers: ['Dr. Ahmed Hassan', 'Dr. Sarah Khan'],
+            objectives: 'Master advanced cardiac diagnosis and treatment procedures',
+            curriculum: ['ECG Interpretation', 'Cardiac Catheterization', 'Heart Surgery Basics', 'Emergency Cardiology'],
+            rating: 4.8,
+            status: 'Active',
+            startDate: '2024-02-01',
+            endDate: '2024-03-29',
+            materials: 12,
+            completionRate: 85
+        },
+        {
+            id: 2,
+            title: 'Emergency Medicine',
+            duration: '6 weeks',
+            mode: 'On-site',
+            totalSessions: 18,
+            traineesEnrolled: 18,
+            assignedTrainers: ['Dr. Fatima Sheikh', 'Dr. Omar Malik'],
+            objectives: 'Develop critical emergency response and trauma care skills',
+            curriculum: ['Trauma Assessment', 'Emergency Procedures', 'Critical Care', 'Emergency Pharmacology'],
+            rating: 4.6,
+            status: 'Active',
+            startDate: '2024-02-15',
+            endDate: '2024-03-29',
+            materials: 8,
+            completionRate: 78
+        }
+    ];
+}
+
+function getDefaultTrainersData() {
+    return [
+        {
+            id: 1,
+            name: 'Dr. Ahmed Hassan',
+            specialty: 'Cardiology',
+            coursesHandled: ['Advanced Cardiology', 'Basic ECG Reading'],
+            branchAssigned: 'Downtown Medical Center',
+            rating: 4.8,
+            phone: '+92-300-1111111',
+            email: 'ahmed.hassan@hospital.com',
+            qualifications: 'MBBS, MD Cardiology, FCPS',
+            experience: '12 years',
+            status: 'Active',
+            totalTrainees: 45,
+            completedCourses: 8,
+            availability: 'Full-time'
+        },
+        {
+            id: 2,
+            name: 'Dr. Fatima Sheikh',
+            specialty: 'Emergency Medicine',
+            coursesHandled: ['Emergency Medicine', 'Trauma Care'],
+            branchAssigned: 'City General Hospital',
+            rating: 4.6,
+            phone: '+92-301-2222222',
+            email: 'fatima.sheikh@hospital.com',
+            qualifications: 'MBBS, FCPS Emergency Medicine',
+            experience: '8 years',
+            status: 'Active',
+            totalTrainees: 32,
+            completedCourses: 6,
+            availability: 'Part-time'
+        }
+    ];
+}
+
+function getDefaultScheduleData() {
+    return [
+        {
+            id: 1,
+            title: 'Advanced Cardiology - Module 3',
+            course: 'Advanced Cardiology',
+            trainer: 'Dr. Ahmed Hassan',
+            branch: 'Downtown Medical Center',
+            date: '2024-01-28',
+            time: '09:00 - 11:00',
+            attendees: 24,
+            type: 'Lecture',
+            status: 'Scheduled'
+        },
+        {
+            id: 2,
+            title: 'Emergency Medicine - Practical',
+            course: 'Emergency Medicine',
+            trainer: 'Dr. Fatima Sheikh',
+            branch: 'City General Hospital',
+            date: '2024-01-28',
+            time: '14:00 - 16:00',
+            attendees: 18,
+            type: 'Practical',
+            status: 'Scheduled'
+        }
+    ];
+}
+
+// Data persistence functions
+function saveApplicationData() {
+    saveToStorage('branchesData', window.appData.branchesData);
+    saveToStorage('traineesData', window.appData.traineesData);
+    saveToStorage('coursesData', window.appData.coursesData);
+    saveToStorage('trainersData', window.appData.trainersData);
+    saveToStorage('scheduleData', window.appData.scheduleData);
+}
+
+// Auto-save data every 30 seconds
+setInterval(saveApplicationData, 30000);
+
+// Save data before page unload
+window.addEventListener('beforeunload', function() {
+    saveApplicationData();
+});
+</script>
