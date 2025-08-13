@@ -1,0 +1,380 @@
+// Utility Functions and Constants (Vanilla JavaScript - No jQuery)
+<script>
+// Global application data
+window.appData = {
+    branchesData: [],
+    traineesData: [],
+    coursesData: [],
+    trainersData: [],
+    scheduleData: [],
+    upcomingSessions: []
+};
+
+// Common data arrays
+window.commonData = {
+    branches: [
+        'Downtown Medical Center',
+        'City General Hospital',
+        'Capital Health Center',
+        'Regional Medical Complex'
+    ],
+    
+    courses: [
+        'Advanced Cardiology',
+        'Emergency Medicine',
+        'Pediatric Care',
+        'Basic Surgery',
+        'Internal Medicine',
+        'Diagnostic Imaging',
+        'Neurology Basics',
+        'Orthopedic Care'
+    ],
+    
+    trainers: [
+        'Dr. Ahmed Hassan',
+        'Dr. Fatima Sheikh',
+        'Dr. Hassan Raza',
+        'Dr. Ayesha Malik',
+        'Dr. Sarah Khan',
+        'Dr. Omar Malik'
+    ],
+    
+    specialties: [
+        'Cardiology',
+        'Emergency Medicine',
+        'Pediatrics',
+        'Surgery',
+        'Internal Medicine',
+        'Neurology',
+        'Orthopedics',
+        'Radiology',
+        'Psychiatry',
+        'Dermatology'
+    ],
+    
+    sessionTypes: [
+        'Lecture',
+        'Practical',
+        'Assessment',
+        'Workshop'
+    ]
+};
+
+// DOM Helper Functions (jQuery replacements)
+function $(selector) {
+    if (typeof selector === 'string') {
+        return document.querySelector(selector);
+    }
+    return selector;
+}
+
+function $$(selector) {
+    return document.querySelectorAll(selector);
+}
+
+function addClass(element, className) {
+    if (element) element.classList.add(className);
+}
+
+function removeClass(element, className) {
+    if (element) element.classList.remove(className);
+}
+
+function toggleClass(element, className) {
+    if (element) element.classList.toggle(className);
+}
+
+function hasClass(element, className) {
+    return element ? element.classList.contains(className) : false;
+}
+
+function setHTML(element, html) {
+    if (element) element.innerHTML = html;
+}
+
+function getHTML(element) {
+    return element ? element.innerHTML : '';
+}
+
+function show(element) {
+    if (element) {
+        element.style.display = '';
+        removeClass(element, 'd-none');
+    }
+}
+
+function hide(element) {
+    if (element) {
+        addClass(element, 'd-none');
+    }
+}
+
+function on(element, event, handler) {
+    if (element) {
+        element.addEventListener(event, handler);
+    }
+}
+
+function off(element, event, handler) {
+    if (element) {
+        element.removeEventListener(event, handler);
+    }
+}
+
+// Utility functions
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+}
+
+function formatTime(timeString) {
+    return new Date('2000-01-01 ' + timeString).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+function getStatusBadge(status) {
+    const statusMap = {
+        'Active': 'status-active',
+        'Completed': 'status-completed',
+        'Pending': 'status-pending',
+        'Cancelled': 'status-cancelled',
+        'Planning': 'status-pending',
+        'On Leave': 'status-pending',
+        'Inactive': 'status-cancelled',
+        'Dropped': 'status-cancelled',
+        'Archived': 'status-cancelled'
+    };
+    
+    const className = statusMap[status] || 'badge-secondary';
+    return `<span class="badge ${className}">${status}</span>`;
+}
+
+function getProgressColor(progress) {
+    if (progress >= 80) return 'bg-success';
+    if (progress >= 60) return 'bg-info';
+    if (progress >= 40) return 'bg-warning';
+    return 'bg-danger';
+}
+
+function getModeBadge(mode) {
+    const colors = {
+        'On-site': 'bg-info text-white',
+        'Online': 'bg-success text-white',
+        'Hybrid': 'bg-primary text-white'
+    };
+    return `<span class="badge ${colors[mode] || 'bg-secondary'}">${mode}</span>`;
+}
+
+function getTypeBadge(type) {
+    const colors = {
+        'Lecture': 'bg-primary text-white',
+        'Practical': 'bg-success text-white',
+        'Assessment': 'bg-warning text-white',
+        'Workshop': 'bg-info text-white'
+    };
+    return `<span class="badge ${colors[type] || 'bg-secondary'}">${type}</span>`;
+}
+
+function getAvailabilityBadge(availability) {
+    const colors = {
+        'Full-time': 'bg-success text-white',
+        'Part-time': 'bg-info text-white',
+        'Unavailable': 'bg-danger text-white'
+    };
+    return `<span class="badge ${colors[availability] || 'bg-secondary'}">${availability}</span>`;
+}
+
+// Alert functions using SweetAlert2
+function showSuccessAlert(title, message) {
+    Swal.fire({
+        icon: 'success',
+        title: title,
+        text: message,
+        confirmButtonColor: '#0d9488'
+    });
+}
+
+function showErrorAlert(title, message) {
+    Swal.fire({
+        icon: 'error',
+        title: title,
+        text: message,
+        confirmButtonColor: '#0d9488'
+    });
+}
+
+function showConfirmDialog(title, message, callback) {
+    Swal.fire({
+        title: title,
+        text: message,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0d9488',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed && callback) {
+            callback();
+        }
+    });
+}
+
+// Form utilities
+function createSelectOptions(options, selectedValue = '') {
+    return options.map(option => 
+        `<option value="${option}" ${selectedValue === option ? 'selected' : ''}>${option}</option>`
+    ).join('');
+}
+
+function getFormData(formId) {
+    const form = $(formId);
+    if (!form) return {};
+    
+    const formData = new FormData(form);
+    return Object.fromEntries(formData);
+}
+
+function validateRequiredFields(data, requiredFields) {
+    for (const field of requiredFields) {
+        if (!data[field] || data[field].trim() === '') {
+            return `Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`;
+        }
+    }
+    return null;
+}
+
+// Bootstrap tab utility
+function initializeTabs(tabsSelector) {
+    const tabElements = $$(tabsSelector + ' button[data-bs-toggle="tab"]');
+    tabElements.forEach(tab => {
+        on(tab, 'click', function(e) {
+            e.preventDefault();
+            const tabTrigger = new bootstrap.Tab(tab);
+            tabTrigger.show();
+        });
+    });
+}
+
+// Local storage utilities
+function saveToStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+        console.warn('Could not save to localStorage:', e);
+    }
+}
+
+function loadFromStorage(key, defaultValue = null) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (e) {
+        console.warn('Could not load from localStorage:', e);
+        return defaultValue;
+    }
+}
+
+// Generate unique ID
+function generateId() {
+    return Date.now() + Math.random().toString(36).substr(2, 5);
+}
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Google Apps Script API caller
+function callServerFunction(functionName, ...args) {
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            [functionName](...args);
+    });
+}
+
+// API wrapper functions
+async function apiCall(endpoint, data = null) {
+    try {
+        showLoading();
+        let result;
+        
+        switch(endpoint) {
+            case 'getBranches':
+                result = await callServerFunction('getBranches', data);
+                break;
+            case 'createBranch':
+                result = await callServerFunction('createBranch', data);
+                break;
+            case 'updateBranch':
+                result = await callServerFunction('updateBranch', data.id, data);
+                break;
+            case 'deleteBranch':
+                result = await callServerFunction('deleteBranch', data);
+                break;
+            case 'getTrainees':
+                result = await callServerFunction('getTrainees', data);
+                break;
+            case 'createTrainee':
+                result = await callServerFunction('createTrainee', data);
+                break;
+            case 'updateTrainee':
+                result = await callServerFunction('updateTrainee', data.id, data);
+                break;
+            case 'getCourses':
+                result = await callServerFunction('getCourses', data);
+                break;
+            case 'createCourse':
+                result = await callServerFunction('createCourse', data);
+                break;
+            case 'updateCourse':
+                result = await callServerFunction('updateCourse', data.id, data);
+                break;
+            case 'getTrainers':
+                result = await callServerFunction('getTrainers', data);
+                break;
+            case 'createTrainer':
+                result = await callServerFunction('createTrainer', data);
+                break;
+            case 'updateTrainer':
+                result = await callServerFunction('updateTrainer', data.id, data);
+                break;
+            case 'getSchedule':
+                result = await callServerFunction('getSchedule', data);
+                break;
+            case 'createScheduleSession':
+                result = await callServerFunction('createScheduleSession', data);
+                break;
+            case 'updateScheduleSession':
+                result = await callServerFunction('updateScheduleSession', data.id, data);
+                break;
+            case 'getDashboardStats':
+                result = await callServerFunction('getDashboardStats');
+                break;
+            default:
+                throw new Error('Unknown endpoint: ' + endpoint);
+        }
+        
+        hideLoading();
+        return result;
+    } catch (error) {
+        hideLoading();
+        console.error('API call failed:', error);
+        showErrorAlert('Error', 'Failed to communicate with server: ' + error.toString());
+        throw error;
+    }
+}
+</script>
