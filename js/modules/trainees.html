@@ -1,0 +1,701 @@
+<script>
+// Trainees Module
+function loadTraineesModule() {
+    const content = `
+        <!-- Module Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Medical Trainees</h2>
+                <p class="text-muted mb-0">Track and manage enrolled medical trainees across all branches</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddTraineeModal()">
+                <i class="bi bi-plus-lg me-2"></i>Add Trainee
+            </button>
+        </div>
+
+        <!-- Trainee Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Trainees</h6>
+                            <h3 class="card-title text-teal mb-0">4</h3>
+                            <small class="text-primary">Enrolled</small>
+                        </div>
+                        <div class="text-teal">
+                            <i class="bi bi-mortarboard fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Active Training</h6>
+                            <h3 class="card-title text-success mb-0">2</h3>
+                            <small class="text-success">In progress</small>
+                        </div>
+                        <div class="text-success">
+                            <i class="bi bi-check-circle fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Completed</h6>
+                            <h3 class="card-title text-info mb-0">1</h3>
+                            <small class="text-primary">Graduated</small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-award fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Avg Progress</h6>
+                            <h3 class="card-title text-warning mb-0">65%</h3>
+                            <small class="text-muted">Completion rate</small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-graph-up fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Filters</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="filter-status">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="dropped">Dropped</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Hospital Branch</label>
+                        <select class="form-select" id="filter-branch">
+                            <option value="all">All Branches</option>
+                            <option value="Downtown Medical Center">Downtown Medical Center</option>
+                            <option value="City General Hospital">City General Hospital</option>
+                            <option value="Capital Health Center">Capital Health Center</option>
+                            <option value="Regional Medical Complex">Regional Medical Complex</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Course</label>
+                        <select class="form-select" id="filter-course">
+                            <option value="all">All Courses</option>
+                            <option value="Advanced Cardiology">Advanced Cardiology</option>
+                            <option value="Emergency Medicine">Emergency Medicine</option>
+                            <option value="Pediatric Care">Pediatric Care</option>
+                            <option value="Basic Surgery">Basic Surgery</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-outline-primary" onclick="applyFilters()">
+                            <i class="bi bi-funnel me-2"></i>Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trainees Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Trainee Directory</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="trainees-table">
+                        <thead>
+                            <tr>
+                                <th>Trainee</th>
+                                <th>Branch</th>
+                                <th>Course</th>
+                                <th>Trainer</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trainees-tbody">
+                            <!-- Table content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // $('#module-content').html(content);
+    // loadTraineesData();
+    // setupTraineeFilters();
+    
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadTraineesData();
+        setupTraineeFilters();
+    }
+
+}
+
+function loadTraineesData() {
+    const trainees = [
+        {
+            id: 1,
+            name: 'Dr. Aisha Khan',
+            cnic: '12345-6789012-3',
+            phone: '+92-300-1234567',
+            email: 'aisha.khan@email.com',
+            hospitalBranch: 'Downtown Medical Center',
+            courseEnrolled: 'Advanced Cardiology',
+            trainer: 'Dr. Ahmed Hassan',
+            enrollmentDate: '2024-01-15',
+            status: 'Active',
+            progress: 75,
+            completedModules: 6,
+            totalModules: 8,
+            certificatesEarned: 2
+        },
+        {
+            id: 2,
+            name: 'Dr. Muhammad Ali',
+            cnic: '12345-6789012-4',
+            phone: '+92-301-2345678',
+            email: 'muhammad.ali@email.com',
+            hospitalBranch: 'City General Hospital',
+            courseEnrolled: 'Emergency Medicine',
+            trainer: 'Dr. Fatima Sheikh',
+            enrollmentDate: '2024-02-01',
+            status: 'Active',
+            progress: 60,
+            completedModules: 4,
+            totalModules: 8,
+            certificatesEarned: 1
+        },
+        {
+            id: 3,
+            name: 'Dr. Fatima Malik',
+            cnic: '12345-6789012-5',
+            phone: '+92-302-3456789',
+            email: 'fatima.malik@email.com',
+            hospitalBranch: 'Capital Health Center',
+            courseEnrolled: 'Pediatric Care',
+            trainer: 'Dr. Hassan Raza',
+            enrollmentDate: '2023-11-20',
+            status: 'Completed',
+            progress: 100,
+            completedModules: 10,
+            totalModules: 10,
+            certificatesEarned: 3
+        },
+        {
+            id: 4,
+            name: 'Dr. Omar Sheikh',
+            cnic: '12345-6789012-6',
+            phone: '+92-303-4567890',
+            email: 'omar.sheikh@email.com',
+            hospitalBranch: 'Regional Medical Complex',
+            courseEnrolled: 'Basic Surgery',
+            trainer: 'Dr. Ayesha Malik',
+            enrollmentDate: '2024-03-10',
+            status: 'Dropped',
+            progress: 25,
+            completedModules: 2,
+            totalModules: 8,
+            certificatesEarned: 0
+        }
+    ];
+    
+    renderTraineesTable(trainees);
+    
+    // Store trainees data globally for reference
+    window.traineesData = trainees;
+}
+
+function renderTraineesTable(trainees) {
+    let tableHtml = '';
+    
+    trainees.forEach(trainee => {
+        const progressColor = getProgressColor(trainee.progress);
+        
+        tableHtml += `
+            <tr>
+                <td>
+                    <div>
+                        <div class="fw-medium">${trainee.name}</div>
+                        <small class="text-muted">${trainee.email}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-1 text-muted"></i>
+                        <span>${trainee.hospitalBranch}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <div class="fw-medium">${trainee.courseEnrolled}</div>
+                        <small class="text-muted">${trainee.completedModules}/${trainee.totalModules} modules</small>
+                    </div>
+                </td>
+                <td>${trainee.trainer}</td>
+                <td>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">${trainee.progress}%</small>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar ${progressColor}" style="width: ${trainee.progress}%"></div>
+                        </div>
+                    </div>
+                </td>
+                <td>${getStatusBadge(trainee.status)}</td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary btn-action" onclick="viewTraineeProfile(${trainee.id})" title="View Profile">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-action" onclick="assignCourse(${trainee.id})" title="Assign Course">
+                            <i class="bi bi-book"></i>
+                        </button>
+                        <button class="btn btn-outline-info btn-action" onclick="editTrainee(${trainee.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    // $('#trainees-tbody').html(tableHtml);
+    const moduleContent = $('#trainees-tbody');
+    if (moduleContent) {
+        setHTML(moduleContent, tableHtml);
+    }
+}
+
+function getProgressColor(progress) {
+    if (progress >= 80) return 'bg-success';
+    if (progress >= 60) return 'bg-info';
+    if (progress >= 40) return 'bg-warning';
+    return 'bg-danger';
+}
+
+function setupTraineeFilters() {
+    // 1. 把所有 filter 元素的 ID 存放在一个数组中
+    const filterIds = ['filter-status', 'filter-branch', 'filter-course'];
+
+    // 2. 遍历这个数组
+    filterIds.forEach(id => {
+        // 3. 使用原生 JavaScript 的 document.getElementById 获取每一个元素
+        const filterElement = document.getElementById(id);
+
+        // 4. (好习惯) 确认元素存在后，再为其添加 'change' 事件监听
+        if (filterElement) {
+            filterElement.addEventListener('change', applyFilters);
+        }
+    });
+}
+
+function applyFilters() {
+    // 使用 document.getElementById(...).value 来获取元素的值
+    const statusFilter = document.getElementById('filter-status').value;
+    const branchFilter = document.getElementById('filter-branch').value;
+    const courseFilter = document.getElementById('filter-course').value;
+    
+    // 从这里开始，你原来的所有代码都是标准的原生 JavaScript，
+    // 所以完全不需要做任何改动。
+    let filteredTrainees = window.traineesData;
+    
+    if (statusFilter !== 'all') {
+        filteredTrainees = filteredTrainees.filter(t => t.status.toLowerCase() === statusFilter);
+    }
+    
+    if (branchFilter !== 'all') {
+        filteredTrainees = filteredTrainees.filter(t => t.hospitalBranch === branchFilter);
+    }
+    
+    if (courseFilter !== 'all') {
+        filteredTrainees = filteredTrainees.filter(t => t.courseEnrolled === courseFilter);
+    }
+    
+    renderTraineesTable(filteredTrainees);
+}
+
+function viewTraineeProfile(traineeId) {
+    const trainee = window.traineesData.find(t => t.id === traineeId);
+    if (!trainee) return;
+    
+    Swal.fire({
+        title: `${trainee.name} - Profile`,
+        html: `
+            <div class="text-start">
+                <ul class="nav nav-tabs mb-3" id="trainee-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab">
+                            Personal Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab">
+                            Training Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="progress-tab" data-bs-toggle="tab" data-bs-target="#progress" type="button" role="tab">
+                            Progress
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="trainee-tab-content">
+                    <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Full Name</h6>
+                                <p class="mb-0">${trainee.name}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">CNIC</h6>
+                                <p class="mb-0">${trainee.cnic}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Phone</h6>
+                                <p class="mb-0">${trainee.phone}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Email</h6>
+                                <p class="mb-0">${trainee.email}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="training" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Hospital Branch</h6>
+                                <p class="mb-0">${trainee.hospitalBranch}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Current Course</h6>
+                                <p class="mb-0">${trainee.courseEnrolled}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Assigned Trainer</h6>
+                                <p class="mb-0">${trainee.trainer}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted mb-1">Enrollment Date</h6>
+                                <p class="mb-0">${formatDate(trainee.enrollmentDate)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="progress" role="tabpanel">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-primary">${trainee.progress}%</h4>
+                                    <small class="text-muted">Overall Progress</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-info">${trainee.completedModules}/${trainee.totalModules}</h4>
+                                    <small class="text-muted">Modules Completed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <h4 class="mb-1 text-success">${trainee.certificatesEarned}</h4>
+                                    <small class="text-muted">Certificates Earned</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Course Progress</h6>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar ${getProgressColor(trainee.progress)}" style="width: ${trainee.progress}%">
+                                    ${trainee.progress}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        width: '700px',
+        showCancelButton: false,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0d9488',
+        didOpen: () => {
+            // Initialize Bootstrap tabs
+            const tabElements = document.querySelectorAll('#trainee-tabs button[data-bs-toggle="tab"]');
+            tabElements.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabTrigger = new bootstrap.Tab(tab);
+                    tabTrigger.show();
+                });
+            });
+        }
+    });
+}
+
+function assignCourse(traineeId) {
+    const trainee = window.traineesData.find(t => t.id === traineeId);
+    if (!trainee) return;
+    
+    Swal.fire({
+        title: `Assign Course to ${trainee.name}`,
+        html: `
+            <form id="assign-course-form">
+                <div class="mb-3">
+                    <label class="form-label">Select Course</label>
+                    <select class="form-select" name="course" required>
+                        <option value="">Choose course</option>
+                        <option value="Advanced Cardiology">Advanced Cardiology</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Pediatric Care">Pediatric Care</option>
+                        <option value="Basic Surgery">Basic Surgery</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Diagnostic Imaging">Diagnostic Imaging</option>
+                        <option value="Neurology Basics">Neurology Basics</option>
+                        <option value="Orthopedic Care">Orthopedic Care</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Assign Trainer (Optional)</label>
+                    <select class="form-select" name="trainer">
+                        <option value="">Select trainer</option>
+                        <option value="Dr. Ahmed Hassan">Dr. Ahmed Hassan</option>
+                        <option value="Dr. Fatima Sheikh">Dr. Fatima Sheikh</option>
+                        <option value="Dr. Hassan Raza">Dr. Hassan Raza</option>
+                        <option value="Dr. Ayesha Malik">Dr. Ayesha Malik</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="startDate">
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Assign Course',
+        confirmButtonColor: '#0d9488',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('assign-course-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.course) {
+                Swal.showValidationMessage('Please select a course');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Update trainee data
+            const traineeIndex = window.traineesData.findIndex(t => t.id === traineeId);
+            if (traineeIndex !== -1) {
+                window.traineesData[traineeIndex].courseEnrolled = result.value.course;
+                if (result.value.trainer) {
+                    window.traineesData[traineeIndex].trainer = result.value.trainer;
+                }
+                window.traineesData[traineeIndex].progress = 0;
+                window.traineesData[traineeIndex].completedModules = 0;
+                window.traineesData[traineeIndex].status = 'Active';
+                
+                applyFilters(); // Refresh table with current filters
+                showSuccessAlert('Success', 'Course assigned successfully!');
+            }
+        }
+    });
+}
+
+function editTrainee(traineeId) {
+    const trainee = window.traineesData.find(t => t.id === traineeId);
+    if (!trainee) return;
+    
+    Swal.fire({
+        title: 'Edit Trainee Information',
+        html: `
+            <form id="edit-trainee-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="name" value="${trainee.name}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CNIC</label>
+                        <input type="text" class="form-control" name="cnic" value="${trainee.cnic}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="${trainee.phone}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="${trainee.email}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Hospital Branch</label>
+                        <select class="form-select" name="hospitalBranch">
+                            <option value="Downtown Medical Center" ${trainee.hospitalBranch === 'Downtown Medical Center' ? 'selected' : ''}>Downtown Medical Center</option>
+                            <option value="City General Hospital" ${trainee.hospitalBranch === 'City General Hospital' ? 'selected' : ''}>City General Hospital</option>
+                            <option value="Capital Health Center" ${trainee.hospitalBranch === 'Capital Health Center' ? 'selected' : ''}>Capital Health Center</option>
+                            <option value="Regional Medical Complex" ${trainee.hospitalBranch === 'Regional Medical Complex' ? 'selected' : ''}>Regional Medical Complex</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="Active" ${trainee.status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="Completed" ${trainee.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Dropped" ${trainee.status === 'Dropped' ? 'selected' : ''}>Dropped</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update Trainee',
+        confirmButtonColor: '#0d9488',
+        width: '600px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('edit-trainee-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.cnic) {
+                Swal.showValidationMessage('Please fill in required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Update trainee data
+            const traineeIndex = window.traineesData.findIndex(t => t.id === traineeId);
+            if (traineeIndex !== -1) {
+                window.traineesData[traineeIndex] = { 
+                    ...window.traineesData[traineeIndex], 
+                    ...result.value 
+                };
+                applyFilters(); // Refresh table
+                showSuccessAlert('Success', 'Trainee information updated successfully!');
+            }
+        }
+    });
+}
+
+function showAddTraineeModal() {
+    Swal.fire({
+        title: 'Add New Trainee',
+        html: `
+            <form id="add-trainee-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" name="name" placeholder="Dr. John Smith" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CNIC *</label>
+                        <input type="text" class="form-control" name="cnic" placeholder="12345-6789012-3" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="+92-300-1234567">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" placeholder="trainee@email.com">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Hospital Branch *</label>
+                        <select class="form-select" name="hospitalBranch" required>
+                            <option value="">Select branch</option>
+                            <option value="Downtown Medical Center">Downtown Medical Center</option>
+                            <option value="City General Hospital">City General Hospital</option>
+                            <option value="Capital Health Center">Capital Health Center</option>
+                            <option value="Regional Medical Complex">Regional Medical Complex</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course to Enroll</label>
+                        <select class="form-select" name="courseEnrolled">
+                            <option value="">Select course (optional)</option>
+                            <option value="Advanced Cardiology">Advanced Cardiology</option>
+                            <option value="Emergency Medicine">Emergency Medicine</option>
+                            <option value="Pediatric Care">Pediatric Care</option>
+                            <option value="Basic Surgery">Basic Surgery</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add Trainee',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('add-trainee-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.cnic || !data.hospitalBranch) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Add new trainee to data
+            const newTrainee = {
+                id: window.traineesData.length + 1,
+                name: result.value.name,
+                cnic: result.value.cnic,
+                phone: result.value.phone || 'Not provided',
+                email: result.value.email || 'Not provided',
+                hospitalBranch: result.value.hospitalBranch,
+                courseEnrolled: result.value.courseEnrolled || 'Not enrolled',
+                trainer: 'Not assigned',
+                enrollmentDate: new Date().toISOString().split('T')[0],
+                status: result.value.courseEnrolled ? 'Active' : 'Pending',
+                progress: 0,
+                completedModules: 0,
+                totalModules: 8,
+                certificatesEarned: 0
+            };
+            
+            window.traineesData.push(newTrainee);
+            applyFilters(); // Refresh table
+            showSuccessAlert('Success', 'Medical trainee added successfully!');
+        }
+    });
+}
+</script>
