@@ -1,0 +1,485 @@
+<script>
+// Hospital Branches Module
+function loadHospitalBranchesModule() {
+    const content = `
+        <!-- Module Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Hospital Branches</h2>
+                <p class="text-muted mb-0">Manage multiple hospital locations under the consultancy network</p>
+            </div>
+            <button class="btn btn-primary" onclick="showAddBranchModal()">
+                <i class="bi bi-plus-lg me-2"></i>Add New Branch
+            </button>
+        </div>
+
+        <!-- Branch Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Branches</h6>
+                            <h3 class="card-title text-primary mb-0">4</h3>
+                            <small class="text-success">Across 3 cities</small>
+                        </div>
+                        <div class="text-primary">
+                            <i class="bi bi-building fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Total Trainees</h6>
+                            <h3 class="card-title text-info mb-0">143</h3>
+                            <small class="text-primary">Active enrollment</small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Average Capacity</h6>
+                            <h3 class="card-title text-warning mb-0">39</h3>
+                            <small class="text-muted">Per branch</small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-geo-alt fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-subtitle text-muted mb-1">Active Branches</h6>
+                            <h3 class="card-title text-success mb-0">3</h3>
+                            <small class="text-success">Operational</small>
+                        </div>
+                        <div class="text-success">
+                            <i class="bi bi-check-circle fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branch List -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Branch Network</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="branches-table">
+                        <thead>
+                            <tr>
+                                <th>Branch Name</th>
+                                <th>Location</th>
+                                <th>Contact</th>
+                                <th>Trainees</th>
+                                <th>Courses</th>
+                                <th>Trainers</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="branches-tbody">
+                            <!-- Table content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    const moduleContent = $('#module-content');
+    if (moduleContent) {
+        setHTML(moduleContent, content);
+        loadBranchesData();
+    }
+    // $('#module-content').html(content);
+    // loadBranchesData();
+}
+
+function loadBranchesData() {
+    const branches = [
+        {
+            id: 1,
+            name: 'Downtown Medical Center',
+            location: 'Lahore, Punjab',
+            phone: '+92-42-111-2233',
+            email: 'downtown@hospital.com',
+            activeTrainees: 45,
+            coursesOffered: 8,
+            trainersAssigned: 12,
+            adminAssigned: 'Dr. Ahmed Khan',
+            capacity: 50,
+            status: 'Active'
+        },
+        {
+            id: 2,
+            name: 'City General Hospital',
+            location: 'Karachi, Sindh',
+            phone: '+92-21-111-4455',
+            email: 'citygeneral@hospital.com',
+            activeTrainees: 38,
+            coursesOffered: 6,
+            trainersAssigned: 9,
+            adminAssigned: 'Dr. Fatima Ali',
+            capacity: 40,
+            status: 'Active'
+        },
+        {
+            id: 3,
+            name: 'Capital Health Center',
+            location: 'Islamabad, ICT',
+            phone: '+92-51-111-6677',
+            email: 'capital@hospital.com',
+            activeTrainees: 32,
+            coursesOffered: 7,
+            trainersAssigned: 8,
+            adminAssigned: 'Dr. Hassan Raza',
+            capacity: 35,
+            status: 'Active'
+        },
+        {
+            id: 4,
+            name: 'Regional Medical Complex',
+            location: 'Faisalabad, Punjab',
+            phone: '+92-41-111-8899',
+            email: 'regional@hospital.com',
+            activeTrainees: 28,
+            coursesOffered: 5,
+            trainersAssigned: 7,
+            adminAssigned: 'Dr. Ayesha Malik',
+            capacity: 30,
+            status: 'Pending Setup'
+        }
+    ];
+    
+    let tableHtml = '';
+    branches.forEach(branch => {
+        const utilizationPercentage = Math.round((branch.activeTrainees / branch.capacity) * 100);
+        
+        tableHtml += `
+            <tr>
+                <td>
+                    <div>
+                        <div class="fw-medium">${branch.name}</div>
+                        <small class="text-muted">Admin: ${branch.adminAssigned}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-1 text-muted"></i>
+                        <span>${branch.location}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-telephone me-1 text-muted"></i>
+                            <small>${branch.phone}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-envelope me-1 text-muted"></i>
+                            <small>${branch.email}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="text-center">
+                        <div class="fw-medium">${branch.activeTrainees}</div>
+                        <small class="text-muted">of ${branch.capacity}</small>
+                        <div class="progress progress-sm mt-1" style="height: 4px;">
+                            <div class="progress-bar" style="width: ${utilizationPercentage}%"></div>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">${branch.coursesOffered}</td>
+                <td class="text-center">${branch.trainersAssigned}</td>
+                <td>${getStatusBadge(branch.status)}</td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary btn-action" onclick="viewBranchDetails(${branch.id})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-action" onclick="editBranch(${branch.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-action" onclick="deactivateBranch(${branch.id})" title="Deactivate">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    
+    const moduleContent = $('#branches-tbody');
+    if (moduleContent) {
+        setHTML(moduleContent, tableHtml);
+        window.branchesData = branches;
+    }
+    // $('#branches-tbody').html(tableHtml);
+    // // Store branches data globally for reference
+    // window.branchesData = branches;
+}
+
+function viewBranchDetails(branchId) {
+    const branch = window.branchesData.find(b => b.id === branchId);
+    if (!branch) return;
+    
+    const utilizationPercentage = Math.round((branch.activeTrainees / branch.capacity) * 100);
+    
+    Swal.fire({
+        title: `${branch.name} - Details`,
+        html: `
+            <div class="text-start">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Location</h6>
+                        <p class="mb-0">${branch.location}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Admin Assigned</h6>
+                        <p class="mb-0">${branch.adminAssigned}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Phone</h6>
+                        <p class="mb-0">${branch.phone}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Email</h6>
+                        <p class="mb-0">${branch.email}</p>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Capacity</h6>
+                        <p class="mb-0">${branch.activeTrainees} / ${branch.capacity} trainees</p>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: ${utilizationPercentage}%"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-1">Status</h6>
+                        <div>${getStatusBadge(branch.status)}</div>
+                    </div>
+                </div>
+                
+                <h6 class="text-muted mb-2">Performance Metrics</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h5 class="mb-1">${branch.coursesOffered}</h5>
+                            <small class="text-muted">Courses Offered</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h5 class="mb-1">${branch.trainersAssigned}</h5>
+                            <small class="text-muted">Trainers</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h5 class="mb-1">${utilizationPercentage}%</h5>
+                            <small class="text-muted">Utilization</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        width: '600px',
+        showCancelButton: false,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0d9488'
+    });
+}
+
+function editBranch(branchId) {
+    const branch = window.branchesData.find(b => b.id === branchId);
+    if (!branch) return;
+    
+    Swal.fire({
+        title: 'Edit Hospital Branch',
+        html: `
+            <form id="edit-branch-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" name="name" value="${branch.name}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" name="location" value="${branch.location}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="${branch.phone}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="${branch.email}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Admin Assigned</label>
+                        <select class="form-select" name="admin">
+                            <option value="Dr. Ahmed Khan" ${branch.adminAssigned === 'Dr. Ahmed Khan' ? 'selected' : ''}>Dr. Ahmed Khan</option>
+                            <option value="Dr. Fatima Ali" ${branch.adminAssigned === 'Dr. Fatima Ali' ? 'selected' : ''}>Dr. Fatima Ali</option>
+                            <option value="Dr. Hassan Raza" ${branch.adminAssigned === 'Dr. Hassan Raza' ? 'selected' : ''}>Dr. Hassan Raza</option>
+                            <option value="Dr. Ayesha Malik" ${branch.adminAssigned === 'Dr. Ayesha Malik' ? 'selected' : ''}>Dr. Ayesha Malik</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch Capacity</label>
+                        <input type="number" class="form-control" name="capacity" value="${branch.capacity}">
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update Branch',
+        confirmButtonColor: '#0d9488',
+        width: '600px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('edit-branch-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.location) {
+                Swal.showValidationMessage('Please fill in required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Update branch data
+            const branchIndex = window.branchesData.findIndex(b => b.id === branchId);
+            if (branchIndex !== -1) {
+                window.branchesData[branchIndex] = { 
+                    ...window.branchesData[branchIndex], 
+                    ...result.value 
+                };
+                loadBranchesData(); // Reload table
+                showSuccessAlert('Success', 'Branch updated successfully!');
+            }
+        }
+    });
+}
+
+function deactivateBranch(branchId) {
+    const branch = window.branchesData.find(b => b.id === branchId);
+    if (!branch) return;
+    
+    showConfirmDialog(
+        'Deactivate Branch',
+        `Are you sure you want to deactivate "${branch.name}"? This action can be reversed later.`,
+        () => {
+            // Update branch status
+            const branchIndex = window.branchesData.findIndex(b => b.id === branchId);
+            if (branchIndex !== -1) {
+                window.branchesData[branchIndex].status = 'Inactive';
+                loadBranchesData(); // Reload table
+                showSuccessAlert('Success', 'Branch deactivated successfully!');
+            }
+        }
+    );
+}
+
+function showAddBranchModal() {
+    Swal.fire({
+        title: 'Add New Hospital Branch',
+        html: `
+            <form id="add-branch-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch Name *</label>
+                        <input type="text" class="form-control" name="name" placeholder="Enter branch name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">City *</label>
+                        <input type="text" class="form-control" name="city" placeholder="Enter city" required>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Address *</label>
+                        <input type="text" class="form-control" name="address" placeholder="Enter full address" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="+92-XX-XXXXXXX">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" placeholder="branch@hospital.com">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Admin Assigned</label>
+                        <select class="form-select" name="admin">
+                            <option value="">Select admin</option>
+                            <option value="Dr. Ahmed Khan">Dr. Ahmed Khan</option>
+                            <option value="Dr. Fatima Ali">Dr. Fatima Ali</option>
+                            <option value="Dr. Hassan Raza">Dr. Hassan Raza</option>
+                            <option value="Dr. Ayesha Malik">Dr. Ayesha Malik</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Branch Capacity</label>
+                        <input type="number" class="form-control" name="capacity" placeholder="Max trainees" min="1">
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add Branch',
+        confirmButtonColor: '#0d9488',
+        width: '700px',
+        preConfirm: () => {
+            const formData = new FormData(document.getElementById('add-branch-form'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.city || !data.address) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+            }
+            
+            return data;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Add new branch to data
+            const newBranch = {
+                id: window.branchesData.length + 1,
+                name: result.value.name,
+                location: `${result.value.city}`,
+                phone: result.value.phone || 'Not provided',
+                email: result.value.email || 'Not provided',
+                activeTrainees: 0,
+                coursesOffered: 0,
+                trainersAssigned: 0,
+                adminAssigned: result.value.admin || 'Not assigned',
+                capacity: parseInt(result.value.capacity) || 30,
+                status: 'Planning'
+            };
+            
+            window.branchesData.push(newBranch);
+            loadBranchesData(); // Reload table
+            showSuccessAlert('Success', 'Hospital branch added successfully!');
+        }
+    });
+}
+</script>
